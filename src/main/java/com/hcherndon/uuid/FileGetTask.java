@@ -34,7 +34,7 @@ public class FileGetTask implements Runnable {
                 byte[] in = new byte[fileInputStream.available()];
                 fileInputStream.read(in);
                 final String[] raw = new String(in).trim().split(":");
-                uuidapi.getStore().get().put(raw[0], raw[1]);
+                uuidapi.getStore().put(raw[0], raw[1]);
                 uuidapi.runCompletion(new Runnable() {
                     @Override
                     public void run() {

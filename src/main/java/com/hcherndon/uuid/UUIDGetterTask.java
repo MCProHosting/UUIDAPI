@@ -21,7 +21,7 @@ public class UUIDGetterTask implements Runnable {
     @Override
     public void run() {
         for(final Profile profile : uuidapi.getMojangRepository().findProfilesByCriteria(new ProfileCriteria(playerName, AGENT))){
-            uuidapi.getStore().get().put(profile.getName(), profile.getId());
+            uuidapi.getStore().put(profile.getName(), profile.getId());
             uuidapi.runCompletion(new Runnable() {
                 @Override
                 public void run() {

@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,7 +21,7 @@ import java.util.logging.Level;
  * Created by hcherndon on 3/9/14.
  */
 public class UUIDAPI extends JavaPlugin implements Listener {
-    private final int THREAD_COUNT = 12; //In case anyone wants to change it. Should be a good number at 12 though
+    private final int THREAD_COUNT = Math.max(2, Runtime.getRuntime().availableProcessors() - 2); //In case anyone wants to change it. Should be a good number at 12 though
 
     private static UUIDAPI uuidapi;
     public static UUIDAPI getUuidapi() {
@@ -30,7 +31,7 @@ public class UUIDAPI extends JavaPlugin implements Listener {
     }
 
     //Main Store
-    private AtomicReference<Map<String, String>> store = new AtomicReference<Map<String, String>>(new HashMap<String, String>());
+    private ConcurrentHashMap<String, String> store = new ConcurrentHashMap<String, String>();
 
     //Services
     private ExecutorService completionThread = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("UUIDAPI Completor #%d").build());
@@ -95,7 +96,7 @@ public class UUIDAPI extends JavaPlugin implements Listener {
     @Deprecated
     @EventHandler
     public void onJoin(final PlayerJoinEvent event){
-        if(!store.get().containsKey(event.getPlayer().getName()))
+        if(!store.containsKey(event.getPlayer().getName()))
             getUUID(event.getPlayer().getName(), new CompletionTask() {
                 @Override
                 public void onUUIDGet(String playerName, String UUID) {
@@ -113,18 +114,18 @@ public class UUIDAPI extends JavaPlugin implements Listener {
     }
 
     public void getUUID(String playerName, CompletionTask onGet){
-        if(!store.get().containsKey(playerName))
+        if(!store.containsKey(playerName))
             runTask(new UUIDGetterTask(playerName, this, onGet));
         else
-            onGet.onUUIDGet(playerName, store.get().get(playerName));
+            onGet.onUUIDGet(playerName, store.get(playerName));
     }
 
     public String getUuidOfPlayer(String playerName) {
-        return getStore().get().get(playerName);
+        return getStore().get(playerName);
     }
 
     public Collection<Map.Entry<String, String>> getAllStoredUUIDS() {
-        return Collections.unmodifiableCollection(store.get().entrySet());
+        return Collections.unmodifiableCollection(store.entrySet());
     }
 
     public void getPlayerName(final String uuid, final CompletionTask onGet){
@@ -157,7 +158,7 @@ public class UUIDAPI extends JavaPlugin implements Listener {
         });
     }
 
-    protected AtomicReference<Map<String, String>> getStore() {
+    protected ConcurrentHashMap<String, String> getStore() {
         return store;
     }
 
