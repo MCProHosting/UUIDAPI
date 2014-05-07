@@ -103,7 +103,7 @@ public class UUIDAPI extends JavaPlugin implements Listener {
                     if(playerName == null && UUID == null){
                         getLogger().log(Level.SEVERE, "A UUID for {0} was not found in the Mojang database! Is the account not premium?", new Object[]{event.getPlayer().getName()});
                     }
-                    getLogger().log(Level.INFO, "Got, Cached, and Saved {0}'s UUID as '{1}'!", new Object[]{playerName, UUID});
+                    //getLogger().log(Level.INFO, "Got, Cached, and Saved {0}'s UUID as '{1}'!", new Object[]{playerName, UUID});
                     saveInFile(playerName, UUID);
                 }
             });
